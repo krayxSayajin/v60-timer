@@ -1,0 +1,37 @@
+<!-- public/brewmate-icon.svg -->
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Soft latte background -->
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#F2EEE8"></stop>
+      <stop offset="100%" stop-color="#E4DED4"></stop>
+    </radialGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="512" cy="512" r="492" fill="url(#bg)"></circle>
+  <circle cx="512" cy="512" r="492" fill="none" stroke="#CFC8BC" stroke-width="22" opacity="0.85"></circle>
+
+  <!-- V60 rim -->
+  <rect x="252" y="270" width="520" height="22" rx="11" fill="#E38B06"></rect>
+  <!-- V60 cone -->
+  <path d="M284 292 L740 292 L652 520 L372 520 Z" fill="#E38B06"></path>
+  <!-- V60 base ring -->
+  <rect x="360" y="520" width="304" height="18" rx="9" fill="#F5B94C"></rect>
+  <!-- Subtle ridges -->
+  <path d="M360 360 H664" stroke="#FBE7B3" stroke-width="10" stroke-linecap="round" opacity="0.55"></path>
+  <path d="M380 392 H644" stroke="#FBE7B3" stroke-width="9" stroke-linecap="round" opacity="0.45"></path>
+  <path d="M400 424 H624" stroke="#FBE7B3" stroke-width="8" stroke-linecap="round" opacity="0.40"></path>
+
+  <!-- Cup body (light beige) -->
+  <rect x="320" y="560" width="384" height="220" rx="44" fill="#F5E9D5" stroke="#D5CDBF" stroke-width="8"></rect>
+  <!-- Coffee surface -->
+  <rect x="360" y="586" width="304" height="26" rx="13" fill="#8B5E3C"></rect>
+
+  <!-- Cup handle with boundary (draw border first, then inner) -->
+  <path d="M700 610 a 70 70 0 1 1 0 140" fill="none" stroke="#D5CDBF" stroke-width="36" stroke-linecap="round"></path>
+  <path d="M700 610 a 70 70 0 1 1 0 140" fill="none" stroke="#F5E9D5" stroke-width="28" stroke-linecap="round"></path>
+
+  <!-- Soft shadow under cup -->
+  <ellipse cx="512" cy="800" rx="180" ry="26" fill="#000" opacity="0.10"></ellipse>
+</svg>
