@@ -630,8 +630,24 @@ export default function App() {
               const start = i === 0 ? 0 : cumEndMs[i - 1];
               const end = cumEndMs[i];
               const arrow = showWeightTarget ? cumPourTargets[i] : null;
+              const isActivePour = i === currentStepIdx && s.volume > 0; // highlight during pours
               return (
-                <div key={i} className="rounded-xl bg-neutral-800/60 border border-neutral-700 p-3">
+                <div
+                  key={i}
+                  className={[
+                    "relative rounded-xl border p-3 transition-colors",
+                    isActivePour
+                      ? "bg-emerald-500/10 border-emerald-400 shadow-[0_0_0_1px_rgba(16,185,129,0.25)]"
+                      : "bg-neutral-800/60 border-neutral-700"
+                  ].join(" ")}
+                  aria-current={isActivePour ? "step" : undefined}
+                >
+                  {isActivePour && (
+                    <div
+                      className="absolute left-0 top-0 h-full w-1.5 bg-emerald-400 rounded-l-xl"
+                      aria-hidden="true"
+                    />
+                  )}
                   <div className="flex items-center justify-between">
                     <div className="font-medium">{s.label}</div>
                     <div className="text-stone-300 text-sm">{s.volume} g • {fmtSecs(s.durationSec)}</div>
