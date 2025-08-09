@@ -1,12 +1,28 @@
-# React + Vite
+# BrewMate – V60 Multi-Recipe Timer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Brief description**  
+Mobile-first V60 timer with multiple recipes, pour-based running weight targets, two-tone chimes, and a cute finish celebration. Built with React + Tailwind, tuned for iPhone Safari (WCAG AA on light cards).
 
-Currently, two official plugins are available:
+## Features
+- **Multiple recipes (pills to switch):**
+  - Matt Winton — 5-Pour
+  - Tetsu Kasuya — 4:6
+  - James Hoffmann — Bloom + 60/40
+  - James Hoffmann — 5-Pour (2019)
+- **Pour-based running weight target** (shows cumulative target per pour; per-step arrows in list).
+- **Timer UI:** big conic-gradient ring, elapsed vs total, per-step card with mini progress.
+- **Two-tone chime** on every step transition and at finish (iOS user-gesture safe).
+- **Finish celebration** overlay (✓ badge + confetti) with ARIA live announcement.
+- **Accessibility & UX:** WCAG AA on light cards, ≥44px tap targets, mobile-first layout.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Controls & Behaviours
+- **Prev:** Jump to start of previous step (updates targets immediately).
+- **Start/Pause:** Toggle the timer.
+- **Skip:** Jump to end of current step (immediate transition, chime, and target update).
+- **Reset:** Pause, set elapsed to 0, hide celebration, suppress the immediate post-reset chime.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Behaviour details**
+- **Running target is pour-based, not time-based.** It updates instantly on **Skip/Prev**.
+- **Zero-volume steps (Drawdown):** target **holds** at the last non-zero cumulative value.
+- **Auto-stop:** Timer stops at total duration; plays finish chime and shows celebration.
+- **Audio on iOS:** First tap (e.g., Start) initializes audio; ensure ringer isn’t muted.
