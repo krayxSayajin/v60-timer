@@ -1,52 +1,28 @@
 # BrewMate – V60 Multi-Recipe Timer
 
-A mobile-first V60 pour-over timer with multiple recipes, pour-based running weight targets, gentle two-tone chimes, and a cute finish celebration. Built with React 18 + Tailwind CSS v4 (Vite), tuned for iPhone Safari, and designed to pass WCAG AA contrast on light cards.
-
-**Live demo:** https://krayxSayajin.github.io/v60-timer/
-
----
+**Brief description**  
+Mobile-first V60 timer with multiple recipes, pour-based running weight targets, two-tone chimes, and a cute finish celebration. Built with React + Tailwind, tuned for iPhone Safari (WCAG AA on light cards).
 
 ## Features
-
-- **Multiple recipes** (switch with top pills)
+- **Multiple recipes (pills to switch):**
   - Matt Winton — 5-Pour
   - Tetsu Kasuya — 4:6
   - James Hoffmann — Bloom + 60/40
   - James Hoffmann — 5-Pour (2019)
-- **Pour-based running weight target**
-  - Shows the *cumulative* target per pour (and per-step arrows)
-  - Updates instantly on **Skip**/**Prev** (not time-based)
-- **Timer UI**
-  - Big conic-gradient progress ring with inner cutout
-  - Elapsed time + total time
-  - Current step card + mini step progress
-- **Two-tone chime** on every step transition and at finish (iOS-safe; one tap unlock)
-- **Finish celebration** overlay (✓ badge + confetti) with ARIA live announcement
-- **Accessibility**
-  - WCAG AA on light cards
-  - Large tap targets (≥44px)
-  - Mobile-first layout
+- **Pour-based running weight target** (shows cumulative target per pour; per-step arrows in list).
+- **Timer UI:** big conic-gradient ring, elapsed vs total, per-step card with mini progress.
+- **Two-tone chime** on every step transition and at finish (iOS user-gesture safe).
+- **Finish celebration** overlay (✓ badge + confetti) with ARIA live announcement.
+- **Accessibility & UX:** WCAG AA on light cards, ≥44px tap targets, mobile-first layout.
 
----
+## Controls & Behaviours
+- **Prev:** Jump to start of previous step (updates targets immediately).
+- **Start/Pause:** Toggle the timer.
+- **Skip:** Jump to end of current step (immediate transition, chime, and target update).
+- **Reset:** Pause, set elapsed to 0, hide celebration, suppress the immediate post-reset chime.
 
-## Tech stack
-
-- React 18 (hooks)
-- Tailwind CSS v4 with `@tailwindcss/vite`
-- Vite (dev server + build)
-- No external UI libraries
-
----
-
-## Quick start (local)
-
-> Prereqs: Node 18+ (Node 20 LTS recommended) and Git.
-
-```bash
-# clone and install
-git clone https://github.com/krayxSayajin/v60-timer.git
-cd v60-timer
-npm install
-
-# run on LAN so your iPhone can test it
-npm run dev -- --host
+**Behaviour details**
+- **Running target is pour-based, not time-based.** It updates instantly on **Skip/Prev**.
+- **Zero-volume steps (Drawdown):** target **holds** at the last non-zero cumulative value.
+- **Auto-stop:** Timer stops at total duration; plays finish chime and shows celebration.
+- **Audio on iOS:** First tap (e.g., Start) initializes audio; ensure ringer isn’t muted.
