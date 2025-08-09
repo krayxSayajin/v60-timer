@@ -1,12 +1,52 @@
-# React + Vite
+# BrewMate – V60 Multi-Recipe Timer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A mobile-first V60 pour-over timer with multiple recipes, pour-based running weight targets, gentle two-tone chimes, and a cute finish celebration. Built with React 18 + Tailwind CSS v4 (Vite), tuned for iPhone Safari, and designed to pass WCAG AA contrast on light cards.
 
-Currently, two official plugins are available:
+**Live demo:** https://krayxSayajin.github.io/v60-timer/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Multiple recipes** (switch with top pills)
+  - Matt Winton — 5-Pour
+  - Tetsu Kasuya — 4:6
+  - James Hoffmann — Bloom + 60/40
+  - James Hoffmann — 5-Pour (2019)
+- **Pour-based running weight target**
+  - Shows the *cumulative* target per pour (and per-step arrows)
+  - Updates instantly on **Skip**/**Prev** (not time-based)
+- **Timer UI**
+  - Big conic-gradient progress ring with inner cutout
+  - Elapsed time + total time
+  - Current step card + mini step progress
+- **Two-tone chime** on every step transition and at finish (iOS-safe; one tap unlock)
+- **Finish celebration** overlay (✓ badge + confetti) with ARIA live announcement
+- **Accessibility**
+  - WCAG AA on light cards
+  - Large tap targets (≥44px)
+  - Mobile-first layout
+
+---
+
+## Tech stack
+
+- React 18 (hooks)
+- Tailwind CSS v4 with `@tailwindcss/vite`
+- Vite (dev server + build)
+- No external UI libraries
+
+---
+
+## Quick start (local)
+
+> Prereqs: Node 18+ (Node 20 LTS recommended) and Git.
+
+```bash
+# clone and install
+git clone https://github.com/krayxSayajin/v60-timer.git
+cd v60-timer
+npm install
+
+# run on LAN so your iPhone can test it
+npm run dev -- --host
