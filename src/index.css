@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@keyframes coffeeSteam {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.coffee-steam {
+  animation: coffeeSteam 1.5s ease-in-out infinite;
+}

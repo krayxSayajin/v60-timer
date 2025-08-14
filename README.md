@@ -13,6 +13,7 @@ Mobile-first V60 timer with multiple recipes, pour-based running weight targets,
 - **Timer UI:** big conic-gradient ring, elapsed vs total, per-step card with mini progress.
 - **Two-tone chime** on every step transition and at finish (iOS user-gesture safe).
 - **Finish celebration** overlay (✓ badge + confetti) with ARIA live announcement.
+- **Animated coffee icon** highlights the active brewing step.
 - **Accessibility & UX:** WCAG AA on light cards, ≥44px tap targets, mobile-first layout.
 
 ## Controls & Behaviors
