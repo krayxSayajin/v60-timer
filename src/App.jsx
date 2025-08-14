@@ -492,42 +492,38 @@ export default function App() {
               <div className="flex flex-col">
                 <label className="text-xs text-stone-700">Coffee (g)</label>
                 <input
-                  type="number"
-                  inputMode="numeric"
+                  type="range"
                   min={10}
                   max={40}
                   step={1}
                   value={coffeeG}
                   onChange={(e) => setCoffeeG(clampNumber(parseInt(e.target.value || 0, 10), 10, 40))}
-                  className="h-12 rounded-xl px-3 bg-white border border-stone-300 text-neutral-900"
+                  className="h-12 w-full"
                 />
+                <span className="text-sm text-neutral-900 mt-1">{coffeeG} g</span>
               </div>
               {/* Ratio */}
               <div className="flex flex-col">
                 <label className="text-xs text-stone-700">Ratio (1:water)</label>
                 <input
-                  type="number"
-                  inputMode="numeric"
+                  type="range"
                   min={10}
                   max={18}
                   step={1}
                   value={ratio}
                   onChange={(e) => setRatio(clampNumber(parseInt(e.target.value || 0, 10), 10, 18))}
-                  className="h-12 rounded-xl px-3 bg-white border border-stone-300 text-neutral-900"
+                  className="h-12 w-full"
                 />
+                <span className="text-sm text-neutral-900 mt-1">1:{ratio}</span>
               </div>
               {/* Temp */}
               <div className="flex flex-col">
                 <label className="text-xs text-stone-700">Water temp (°C)</label>
                 <input
                   type="number"
-                  inputMode="numeric"
-                  min={80}
-                  max={100}
-                  step={1}
                   value={waterTempC}
-                  onChange={(e) => setWaterTempC(clampNumber(parseInt(e.target.value || 0, 10), 80, 100))}
-                  className="h-12 rounded-xl px-3 bg-white border border-stone-300 text-neutral-900"
+                  readOnly
+                  className="h-12 rounded-xl px-3 bg-gray-200 border border-stone-300 text-neutral-900 cursor-not-allowed"
                 />
               </div>
             </div>
@@ -556,7 +552,7 @@ export default function App() {
               <div
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: `conic-gradient(#f59e0b ${overallProgress * 360}deg, #374151 0deg)`
+                  background: `conic-gradient(#f59e0b ${stepProgress * 360}deg, #374151 0deg)`
                 }}
                 aria-hidden="true"
               />
@@ -564,14 +560,16 @@ export default function App() {
               <div className="absolute inset-3 rounded-full bg-neutral-900 border border-neutral-800" aria-hidden="true" />
               {/* Center timer text */}
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <div className="text-4xl font-semibold tabular-nums">{fmtClock(elapsedMs)}</div>
-                <div className="text-stone-400 text-sm">of {fmtClock(totalDurationMs)}</div>
-                {showWeightTarget && (
-                  <div className="mt-2 text-emerald-400 text-sm">
-                    Target: <span className="font-semibold">{currentPourTarget} g</span>
-                  </div>
-                )}
+                <div className="text-4xl font-semibold tabular-nums">{fmtClock(elapsedMs - stepStartMs)}</div>
+                <div className="text-stone-400 text-sm">of {fmtClock(stepEndMs - stepStartMs)}</div>
               </div>
+            </div>
+            {/* Global progress bar */}
+            <div className="mt-3 h-2 rounded-full bg-neutral-700 overflow-hidden">
+              <div
+                className="h-full rounded-full"
+                style={{ width: `${Math.min(100, Math.max(0, overallProgress * 100))}%`, backgroundColor: "#f59e0b" }}
+              />
             </div>
           </div>
 
