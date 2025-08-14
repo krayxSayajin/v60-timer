@@ -5,8 +5,8 @@ export default function Brew({ recipe, onBack }) {
   const DEFAULT_RATIO = 15;
   const [coffeeG, setCoffeeG] = useState(20);
   const [ratio, setRatio] = useState(DEFAULT_RATIO);
-  const [waterTempC, setWaterTempC] = useState(recipe.defaultTemp);
   const [showWeightTarget, setShowWeightTarget] = useState(true);
+  const waterTempC = recipe.defaultTemp;
   const [coffeeInput, setCoffeeInput] = useState(String(20));
   const [ratioInput, setRatioInput] = useState(String(DEFAULT_RATIO));
   const [isRunning, setIsRunning] = useState(false);
@@ -65,7 +65,6 @@ export default function Brew({ recipe, onBack }) {
   useEffect(() => { setCoffeeInput(String(coffeeG)); }, [coffeeG]);
   useEffect(() => { setRatioInput(String(ratio)); }, [ratio]);
   useEffect(() => {
-    setWaterTempC(recipe.defaultTemp);
     hardReset(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recipe]);
@@ -151,58 +150,58 @@ export default function Brew({ recipe, onBack }) {
   const stepProgress = currentStep ? (Math.min(elapsedMs, stepEndMs) - stepStartMs) / (stepEndMs - stepStartMs || 1) : 0;
   const canPrev = elapsedMs > 0;
   const canSkip = elapsedMs < totalDurationMs;
+  const remainingMs = Math.max(0, stepEndMs - Math.min(elapsedMs, stepEndMs));
+  const remainingSec = Math.ceil(remainingMs / 1000);
+  const radius = 45;
+  const circumference = 2 * Math.PI * radius;
   function confettiColor(i) { const palette = ['#ef4444','#f59e0b','#10b981','#3b82f6','#a855f7','#ec4899','#22d3ee','#84cc16']; return palette[i % palette.length]; }
 
   return (
     <div className="max-w-md mx-auto px-4 pb-28 pt-3">
       <div className="flex items-center justify-between mb-3">
-        <button type="button" className="text-stone-200 text-base underline-offset-4" onClick={() => { hardReset(false); onBack(); }} aria-label="Back">← Back</button>
-        <div className="text-sm text-stone-300 truncate ml-2">{recipe.name}</div>
+        <button type="button" className="text-[var(--color-light-muted)] text-base underline-offset-4" onClick={() => { hardReset(false); onBack(); }} aria-label="Back">← Back</button>
+        <div className="text-sm text-[var(--color-light-muted)] truncate ml-2">{recipe.name}</div>
         <div className="w-12" aria-hidden="true" />
       </div>
 
-      <div className="rounded-2xl bg-stone-50 shadow-sm border border-stone-200 p-4 mt-1">
-        <h2 className="text-neutral-900 font-semibold">{recipe.name}</h2>
-        <p className="text-stone-700 text-sm">{recipe.desc}</p>
+      <div className="rounded-2xl bg-[var(--color-card-bg)] shadow-sm border border-[var(--color-card-border)] p-4 mt-1">
+        <h2 className="text-[var(--color-text)] font-semibold">{recipe.name}</h2>
+        <p className="text-[var(--color-muted)] text-sm">{recipe.desc}</p>
 
         <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
-              <label className="text-xs text-stone-700">Coffee (g)</label>
+              <label className="text-xs text-[var(--color-muted)]">Coffee (g)</label>
             </div>
             <input type="range" min={10} max={40} step={1} value={coffeeG} onChange={e => setCoffeeG(clamp(parseInt(e.target.value,10),10,40))} className="h-12 w-full" />
             <div className="flex items-center gap-2 mt-1">
-              <input type="number" inputMode="numeric" min={10} max={40} step={1} value={coffeeInput} onChange={e => { const v = e.target.value; setCoffeeInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setCoffeeG(clamp(n,10,40)); }} onBlur={() => { const n = parseInt(coffeeInput,10); setCoffeeInput(Number.isNaN(n)? String(coffeeG): String(clamp(n,10,40))); }} className="w-20 h-10 rounded-lg px-2 bg-white border border-stone-300 text-neutral-900" />
-              <span className="text-sm text-neutral-900">{totalWater} g total</span>
+              <input type="number" inputMode="numeric" min={10} max={40} step={1} value={coffeeInput} onChange={e => { const v = e.target.value; setCoffeeInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setCoffeeG(clamp(n,10,40)); }} onBlur={() => { const n = parseInt(coffeeInput,10); setCoffeeInput(Number.isNaN(n)? String(coffeeG): String(clamp(n,10,40))); }} className="w-20 h-10 rounded-lg px-2 bg-[var(--color-card-bg)] border border-[var(--color-card-border)] text-[var(--color-text)]" />
+              <span className="text-sm text-[var(--color-text)]">{totalWater} g total</span>
             </div>
           </div>
 
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
-              <label className="text-xs text-stone-700">Ratio (1:water)</label>
-              <button type="button" onClick={() => { setRatio(DEFAULT_RATIO); setRatioInput(String(DEFAULT_RATIO)); }} className="text-xs px-2 py-1 rounded-lg border border-stone-300 bg-stone-100 text-stone-900" aria-label="Reset ratio to default">Default</button>
+              <label className="text-xs text-[var(--color-muted)]">Ratio (1:water)</label>
+              <button type="button" onClick={() => { setRatio(DEFAULT_RATIO); setRatioInput(String(DEFAULT_RATIO)); }} className="text-xs px-2 py-1 rounded-lg border border-[var(--color-card-border)] bg-[var(--color-bg)] text-[var(--color-text)]" aria-label="Reset ratio to default">Default</button>
             </div>
             <input type="range" min={10} max={18} step={1} value={ratio} onChange={e => { const n = clamp(parseInt(e.target.value,10),10,18); setRatio(n); setRatioInput(String(n)); }} className="h-12 w-full" />
             <div className="flex items-center gap-2 mt-1">
-              <input type="number" inputMode="numeric" min={10} max={18} step={1} value={ratioInput} onChange={e => { const v = e.target.value; setRatioInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setRatio(clamp(n,10,18)); }} onBlur={() => { const n = parseInt(ratioInput,10); setRatioInput(Number.isNaN(n)? String(ratio): String(clamp(n,10,18))); }} className="w-20 h-10 rounded-lg px-2 bg-white border border-stone-300 text-neutral-900" />
+              <input type="number" inputMode="numeric" min={10} max={18} step={1} value={ratioInput} onChange={e => { const v = e.target.value; setRatioInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setRatio(clamp(n,10,18)); }} onBlur={() => { const n = parseInt(ratioInput,10); setRatioInput(Number.isNaN(n)? String(ratio): String(clamp(n,10,18))); }} className="w-20 h-10 rounded-lg px-2 bg-[var(--color-card-bg)] border border-[var(--color-card-border)] text-[var(--color-text)]" />
             </div>
           </div>
 
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
-              <label className="text-xs text-stone-700">Water temp (°C)</label>
-              <button type="button" onClick={() => setWaterTempC(recipe.defaultTemp)} className="text-xs px-2 py-1 rounded-lg border border-stone-300 bg-stone-100 text-stone-900" aria-label="Reset water temp to default">Default</button>
+              <label className="text-xs text-[var(--color-muted)]">Water temp (°C)</label>
             </div>
-            <input type="range" min={85} max={100} step={1} value={waterTempC} onChange={e => setWaterTempC(clamp(parseInt(e.target.value,10),85,100))} className="h-12 w-full" />
-            <div className="flex items-center gap-2 mt-1">
-              <input type="number" inputMode="numeric" min={85} max={100} step={1} value={waterTempC} onChange={e => setWaterTempC(clamp(parseInt(e.target.value,10),85,100))} className="w-20 h-10 rounded-lg px-2 bg-white border border-stone-300 text-neutral-900" />
-            </div>
+            <div className="h-12 flex items-center text-[var(--color-text)]">{waterTempC}°C</div>
           </div>
         </div>
 
         <div className="mt-3 flex items-center gap-2">
           <input id="show-weight" type="checkbox" checked={showWeightTarget} onChange={e => setShowWeightTarget(e.target.checked)} className="h-4 w-4" />
-          <label htmlFor="show-weight" className="text-sm text-stone-700">Show cumulative target</label>
+          <label htmlFor="show-weight" className="text-sm text-[var(--color-muted)]">Show cumulative target</label>
         </div>
       </div>
 
@@ -210,7 +209,7 @@ export default function Brew({ recipe, onBack }) {
       <div className="mt-6 rounded-2xl bg-neutral-900/60 border border-neutral-700 p-5">
         <div className="flex items-baseline gap-2 font-mono">
           <div className="text-4xl font-semibold tracking-tight">{fmtClock(elapsedMs)}</div>
-          <div className="text-stone-400">/ {fmtClock(totalDurationMs)}</div>
+          <div className="text-[var(--color-light-muted)]">/ {fmtClock(totalDurationMs)}</div>
         </div>
         <div className="mt-4 h-3 bg-neutral-800 rounded-full overflow-hidden">
           <div className="h-full bg-emerald-500" style={{ width: `${overallProgress * 100}%` }} />
@@ -218,17 +217,24 @@ export default function Brew({ recipe, onBack }) {
         <div className="mt-2 h-1 bg-neutral-800 rounded-full overflow-hidden">
           <div className="h-full bg-emerald-400" style={{ width: `${stepProgress * 100}%` }} />
         </div>
-        <div className="mt-4 text-sm text-stone-300" aria-live="polite">
+        <div className="mt-6 flex justify-center">
+          <svg className="w-24 h-24" viewBox="0 0 100 100">
+            <circle className="text-neutral-800" stroke="currentColor" strokeWidth="8" fill="transparent" r={radius} cx="50" cy="50" />
+            <circle className="text-emerald-400 transition-all" stroke="currentColor" strokeWidth="8" strokeLinecap="round" fill="transparent" r={radius} cx="50" cy="50" style={{ strokeDasharray: circumference, strokeDashoffset: circumference * (1 - stepProgress) }} />
+            <text x="50" y="55" textAnchor="middle" className="fill-white text-xl font-mono">{fmtSecs(remainingSec)}</text>
+          </svg>
+        </div>
+        <div className="mt-4 text-sm text-[var(--color-light-muted)]" aria-live="polite">
           <div className="flex items-center justify-between">
             <div className="font-medium">{currentStep?.label || 'Step'}</div>
-            <div className="text-stone-300 text-sm">{currentStep?.volume || 0} g • {fmtSecs(currentStep?.durationSec || 0)}</div>
+            <div className="text-[var(--color-light-muted)] text-sm">{currentStep?.volume || 0} g • {fmtSecs(currentStep?.durationSec || 0)}</div>
           </div>
           <div className="mt-4 grid grid-cols-3 gap-2">
             <button type="button" onClick={onPrev} disabled={!canPrev} className={["h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-medium", !canPrev ? "opacity-50 cursor-not-allowed" : ""].join(' ')}>Prev</button>
             <button type="button" onClick={onStartPause} className="h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold">{isRunning ? 'Pause' : 'Start'}</button>
             <button type="button" onClick={onSkip} disabled={!canSkip} className={["h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-medium", !canSkip ? "opacity-50 cursor-not-allowed" : ""].join(' ')}>Skip</button>
           </div>
-          <button type="button" onClick={onReset} className="mt-3 w-full h-12 rounded-xl border border-stone-500 bg-neutral-900 text-stone-200 font-medium">Reset</button>
+          <button type="button" onClick={onReset} className="mt-3 w-full h-12 rounded-xl border border-[var(--color-light-muted)] bg-neutral-900 text-[var(--color-light-text)] font-medium">Reset</button>
         </div>
       </div>
 
