@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export default function App() {
   // -----------------------------
@@ -118,6 +118,56 @@ export default function App() {
   const prevStepIdxRef = useRef(null);
   const suppressNextChimeRef = useRef(false);
 
+  // -----------------------------
+  // Audio (two-tone chime), iOS-friendly
+  // -----------------------------
+  function ensureAudioContextFromGesture() {
+    if (!audioCtxRef.current) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return; // fallback: no audio support
+      audioCtxRef.current = new Ctx();
+    }
+    if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
+      audioCtxRef.current.resume();
+    }
+  }
+
+  const playTwoToneChime = useCallback(() => {
+    const ctx = audioCtxRef.current;
+    if (!ctx) return;
+    const now = ctx.currentTime;
+
+    const blip = (startTime, freq, durSec) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, startTime);
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.linearRampToValueAtTime(0.2, startTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        startTime + Math.max(durSec - 0.02, 0.05)
+      );
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(startTime);
+      osc.stop(startTime + durSec + 0.05);
+    };
+
+    // ~660 Hz for ~0.18s, then ~880 Hz for ~0.22s, spaced ~0.22s
+    blip(now, 660, 0.18);
+    blip(now + 0.22, 880, 0.22);
+  }, []);
+
+  const safeChime = useCallback(() => {
+    if (audioCtxRef.current) {
+      try {
+        playTwoToneChime();
+      } catch {
+        /* noop */
+      }
+    }
+  }, [playTwoToneChime]);
+
   // Sync string inputs whenever numeric states change externally (sliders/reset)
   useEffect(() => { setCoffeeInput(String(coffeeG)); }, [coffeeG]);
   useEffect(() => { setRatioInput(String(ratio)); }, [ratio]);
@@ -217,7 +267,7 @@ export default function App() {
         setTimeout(() => setAriaMsg(""), 2000);
       }
     }
-  }, [elapsedMs, totalDurationMs]);
+  }, [elapsedMs, totalDurationMs, safeChime]);
 
   // Chime on step transitions (after first mount, and not right after reset)
   useEffect(() => {
@@ -234,56 +284,13 @@ export default function App() {
       safeChime();
       prevStepIdxRef.current = currentStepIdx;
     }
-  }, [currentStepIdx]);
+  }, [currentStepIdx, safeChime]);
 
   // Auto-scroll active step into view
   useEffect(() => {
     const el = document.getElementById(`step-${currentStepIdx}`);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [currentStepIdx]);
-
-  // -----------------------------
-  // Audio (two-tone chime), iOS-friendly
-  // -----------------------------
-  function ensureAudioContextFromGesture() {
-    if (!audioCtxRef.current) {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return; // fallback: no audio support
-      audioCtxRef.current = new Ctx();
-    }
-    if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
-      audioCtxRef.current.resume();
-    }
-  }
-
-  function playTwoToneChime() {
-    const ctx = audioCtxRef.current;
-    if (!ctx) return;
-    const now = ctx.currentTime;
-
-    const blip = (startTime, freq, durSec) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, startTime);
-      gain.gain.setValueAtTime(0.0001, startTime);
-      gain.gain.linearRampToValueAtTime(0.2, startTime + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + Math.max(durSec - 0.02, 0.05));
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(startTime);
-      osc.stop(startTime + durSec + 0.05);
-    };
-
-    // ~660 Hz for ~0.18s, then ~880 Hz for ~0.22s, spaced ~0.22s
-    blip(now, 660, 0.18);
-    blip(now + 0.22, 880, 0.22);
-  }
-
-  function safeChime() {
-    if (audioCtxRef.current) {
-      try { playTwoToneChime(); } catch { /* noop */ }
-    }
-  }
 
   // -----------------------------
   // Controls
@@ -345,14 +352,6 @@ export default function App() {
 
   const canPrev = elapsedMs > 0;
   const canSkip = elapsedMs < totalDurationMs;
-
-  function shortName(full) {
-    if (full.includes("Matt Winton")) return "Winton — 5-Pour";
-    if (full.includes("Tetsu Kasuya")) return "Kasuya — 4:6";
-    if (full.includes("Bloom + 60/40")) return "Hoffmann — 60/40";
-    if (full.includes("2019")) return "Hoffmann — 5-Pour";
-    return full;
-  }
 
   function confettiColor(i) {
     const palette = ["#ef4444","#f59e0b","#10b981","#3b82f6","#a855f7","#ec4899","#22d3ee","#84cc16"];
