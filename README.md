@@ -15,13 +15,13 @@ Mobile-first V60 timer with multiple recipes, pour-based running weight targets,
 - **Finish celebration** overlay (✓ badge + confetti) with ARIA live announcement.
 - **Accessibility & UX:** WCAG AA on light cards, ≥44px tap targets, mobile-first layout.
 
-## Controls & Behaviours
+## Controls & Behaviors
 - **Prev:** Jump to start of previous step (updates targets immediately).
 - **Start/Pause:** Toggle the timer.
 - **Skip:** Jump to end of current step (immediate transition, chime, and target update).
 - **Reset:** Pause, set elapsed to 0, hide celebration, suppress the immediate post-reset chime.
 
-**Behaviour details**
+**Behavior details**
 - **Running target is pour-based, not time-based.** It updates instantly on **Skip/Prev**.
 - **Zero-volume steps (Drawdown):** target **holds** at the last non-zero cumulative value.
 - **Auto-stop:** Timer stops at total duration; plays finish chime and shows celebration.
