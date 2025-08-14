@@ -214,9 +214,6 @@ export default function Brew({ recipe, onBack }) {
         <div className="mt-4 h-3 bg-neutral-800 rounded-full overflow-hidden">
           <div className="h-full bg-emerald-500" style={{ width: `${overallProgress * 100}%` }} />
         </div>
-        <div className="mt-2 h-1 bg-neutral-800 rounded-full overflow-hidden">
-          <div className="h-full bg-emerald-400" style={{ width: `${stepProgress * 100}%` }} />
-        </div>
         <div className="mt-6 flex justify-center">
           <svg className="w-24 h-24" viewBox="0 0 100 100">
             <circle className="text-neutral-800" stroke="currentColor" strokeWidth="8" fill="transparent" r={radius} cx="50" cy="50" />
