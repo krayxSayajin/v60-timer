@@ -101,6 +101,10 @@ export default function App() {
   const [waterTempC, setWaterTempC] = useState(activeRecipe.defaultTemp);
   const [showWeightTarget, setShowWeightTarget] = useState(true);
 
+  // text inputs that won’t fight typing (allow empty/partial)
+  const [coffeeInput, setCoffeeInput] = useState(String(20));
+  const [ratioInput, setRatioInput] = useState(String(DEFAULT_RATIO));
+
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
 
@@ -113,6 +117,10 @@ export default function App() {
   const audioCtxRef = useRef(null);
   const prevStepIdxRef = useRef(null);
   const suppressNextChimeRef = useRef(false);
+
+  // Sync string inputs whenever numeric states change externally (sliders/reset)
+  useEffect(() => { setCoffeeInput(String(coffeeG)); }, [coffeeG]);
+  useEffect(() => { setRatioInput(String(ratio)); }, [ratio]);
 
   // When switching recipes, set default temp and reset without an immediate chime
   useEffect(() => {
@@ -319,7 +327,7 @@ export default function App() {
   // -----------------------------
   // Small helpers (UI / formatting)
   // -----------------------------
-  const clampNumber = (val, min, max) => Math.max(min, Math.min(max, val));
+  const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
 
   const fmtClock = (ms) => {
     const s = Math.max(0, Math.floor(ms / 1000));
@@ -405,7 +413,7 @@ export default function App() {
         console.assert(holds, "Cumulative target holds in Drawdown");
       }
     } catch {
-      // don't crash on consoles if assertions throw
+      // ignore
     }
   }, [RECIPES]);
 
@@ -476,13 +484,13 @@ export default function App() {
             <div className="w-12" aria-hidden="true" />{/* spacer */}
           </div>
 
-          {/* Active recipe summary card (no pills row) */}
+          {/* Active recipe summary card */}
           <div className="rounded-2xl bg-stone-50 shadow-sm border border-stone-200 p-4 mt-1">
             <h2 className="text-neutral-900 font-semibold">{activeRecipe.name}</h2>
             <p className="text-stone-700 text-sm">{activeRecipe.desc}</p>
 
             <div className="mt-3 grid grid-cols-3 gap-2">
-              {/* Coffee (slider + number) */}
+              {/* Coffee (slider + number input) */}
               <div className="flex flex-col">
                 <div className="flex items-center justify-between">
                   <label className="text-xs text-stone-700">Coffee (g)</label>
@@ -493,7 +501,7 @@ export default function App() {
                   max={40}
                   step={1}
                   value={coffeeG}
-                  onChange={(e) => setCoffeeG(clampNumber(parseInt(e.target.value || 0, 10), 10, 40))}
+                  onChange={(e) => setCoffeeG(clamp(parseInt(e.target.value, 10), 10, 40))}
                   className="h-12 w-full"
                 />
                 <div className="flex items-center gap-2 mt-1">
@@ -503,21 +511,30 @@ export default function App() {
                     min={10}
                     max={40}
                     step={1}
-                    value={coffeeG}
-                    onChange={(e) => setCoffeeG(clampNumber(parseInt(e.target.value || 0, 10), 10, 40))}
+                    value={coffeeInput}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setCoffeeInput(v);
+                      const n = parseInt(v, 10);
+                      if (!Number.isNaN(n)) setCoffeeG(clamp(n, 10, 40));
+                    }}
+                    onBlur={() => {
+                      const n = parseInt(coffeeInput, 10);
+                      setCoffeeInput(Number.isNaN(n) ? String(coffeeG) : String(clamp(n, 10, 40)));
+                    }}
                     className="w-20 h-10 rounded-lg px-2 bg-white border border-stone-300 text-neutral-900"
                   />
-                  <span className="text-sm text-neutral-900">{coffeeG} g</span>
+                  <span className="text-sm text-neutral-900">{totalWater} g total</span>
                 </div>
               </div>
 
-              {/* Ratio (slider + reset-to-default) */}
+              {/* Ratio (slider + number + default) */}
               <div className="flex flex-col">
                 <div className="flex items-center justify-between">
                   <label className="text-xs text-stone-700">Ratio (1:water)</label>
                   <button
                     type="button"
-                    onClick={() => setRatio(DEFAULT_RATIO)}
+                    onClick={() => { setRatio(DEFAULT_RATIO); setRatioInput(String(DEFAULT_RATIO)); }}
                     className="text-xs px-2 py-1 rounded-lg border border-stone-300 bg-stone-100 text-stone-900"
                     aria-label="Reset ratio to default"
                   >
@@ -530,10 +547,35 @@ export default function App() {
                   max={18}
                   step={1}
                   value={ratio}
-                  onChange={(e) => setRatio(clampNumber(parseInt(e.target.value || 0, 10), 10, 18))}
+                  onChange={(e) => {
+                    const n = clamp(parseInt(e.target.value, 10), 10, 18);
+                    setRatio(n);
+                    setRatioInput(String(n));
+                  }}
                   className="h-12 w-full"
                 />
-                <span className="text-sm text-neutral-900 mt-1">1:{ratio}</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={10}
+                    max={18}
+                    step={1}
+                    value={ratioInput}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setRatioInput(v);
+                      const n = parseInt(v, 10);
+                      if (!Number.isNaN(n)) setRatio(clamp(n, 10, 18));
+                    }}
+                    onBlur={() => {
+                      const n = parseInt(ratioInput, 10);
+                      setRatioInput(Number.isNaN(n) ? String(ratio) : String(clamp(n, 10, 18)));
+                    }}
+                    className="w-20 h-10 rounded-lg px-2 bg-white border border-stone-300 text-neutral-900"
+                  />
+                  <span className="text-sm text-neutral-900">1:{ratio}</span>
+                </div>
               </div>
 
               {/* Temp (read-only per recipe) */}
@@ -565,7 +607,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Timer / ring (shows CURRENT STEP time only) */}
+          {/* Timer / ring (CURRENT STEP time only) */}
           <div className="mt-5">
             <div className="relative w-64 h-64 mx-auto">
               {/* Track/progress via conic-gradient (step progress) */}
@@ -605,19 +647,13 @@ export default function App() {
             </div>
           </div>
 
-          {/* Current step panel (keeps mini step bar) */}
+          {/* Current step panel (no mini step bar now) */}
           <div className="mt-5 rounded-2xl bg-neutral-800/60 border border-neutral-700 p-4">
             <div className="flex items-center justify-between">
               <div className="font-medium">{currentStep?.label || "Step"}</div>
               <div className="text-stone-300 text-sm">
                 {currentStep?.volume || 0} g • {fmtSecs(currentStep?.durationSec || 0)}
               </div>
-            </div>
-            <div className="mt-3 h-2 rounded-full bg-neutral-700 overflow-hidden">
-              <div
-                className="h-full rounded-full"
-                style={{ width: `${Math.min(100, Math.max(0, stepProgress * 100))}%`, backgroundColor: "#f59e0b" }}
-              />
             </div>
 
             {/* Controls */}
