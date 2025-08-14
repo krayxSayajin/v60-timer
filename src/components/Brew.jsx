@@ -243,7 +243,7 @@ export default function Brew({ recipe, onBack }) {
           const start = i === 0 ? 0 : cumEndMs[i - 1];
           const end = cumEndMs[i];
           const arrow = showWeightTarget ? cumPourTargets[i] : null;
-          const isActivePour = i === currentStepIdx && s.volume > 0;
+          const isActive = i === currentStepIdx;
           return (
             <Step
               key={i}
@@ -253,7 +253,7 @@ export default function Brew({ recipe, onBack }) {
               end={fmtClock(end)}
               arrow={arrow}
               showWeightTarget={showWeightTarget}
-              isActive={isActivePour}
+              isActive={isActive}
             />
           );
         })}
