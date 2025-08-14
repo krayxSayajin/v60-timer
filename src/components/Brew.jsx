@@ -6,6 +6,7 @@ export default function Brew({ recipe, onBack }) {
   const [coffeeG, setCoffeeG] = useState(20);
   const [ratio, setRatio] = useState(DEFAULT_RATIO);
   const [showWeightTarget, setShowWeightTarget] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
   const waterTempC = recipe.defaultTemp;
   const [coffeeInput, setCoffeeInput] = useState(String(20));
   const [ratioInput, setRatioInput] = useState(String(DEFAULT_RATIO));
@@ -66,6 +67,7 @@ export default function Brew({ recipe, onBack }) {
   useEffect(() => { setRatioInput(String(ratio)); }, [ratio]);
   useEffect(() => {
     hardReset(false);
+    setShowInfo(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recipe]);
 
@@ -152,6 +154,8 @@ export default function Brew({ recipe, onBack }) {
   const canSkip = elapsedMs < totalDurationMs;
   const remainingMs = Math.max(0, stepEndMs - Math.min(elapsedMs, stepEndMs));
   const remainingSec = Math.ceil(remainingMs / 1000);
+  const currentCumTarget = cumPourTargets[currentStepIdx] || 0;
+  const inputsLocked = isRunning || elapsedMs > 0;
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
   function confettiColor(i) { const palette = ['#ef4444','#f59e0b','#10b981','#3b82f6','#a855f7','#ec4899','#22d3ee','#84cc16']; return palette[i % palette.length]; }
@@ -165,17 +169,30 @@ export default function Brew({ recipe, onBack }) {
       </div>
 
       <div className="rounded-2xl bg-[var(--color-card-bg)] shadow-sm border border-[var(--color-card-border)] p-4 mt-1">
-        <h2 className="text-[var(--color-text)] font-semibold">{recipe.name}</h2>
-        <p className="text-[var(--color-muted)] text-sm">{recipe.desc}</p>
+        <div className="flex items-center justify-between">
+          <h2 className="text-[var(--color-text)] font-semibold">{recipe.name}</h2>
+          {recipe.desc && !showInfo && (
+            <button
+              type="button"
+              onClick={() => setShowInfo(true)}
+              className="text-xs text-[var(--color-muted)] underline"
+            >
+              See More Info
+            </button>
+          )}
+        </div>
+        {showInfo && recipe.desc && (
+          <p className="text-[var(--color-muted)] text-sm mt-1">{recipe.desc}</p>
+        )}
 
         <div className="mt-3 grid grid-cols-3 gap-2">
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
               <label className="text-xs text-[var(--color-muted)]">Coffee (g)</label>
             </div>
-            <input type="range" min={10} max={40} step={1} value={coffeeG} onChange={e => setCoffeeG(clamp(parseInt(e.target.value,10),10,40))} className="h-12 w-full" />
+            <input type="range" min={10} max={40} step={1} value={coffeeG} onChange={e => setCoffeeG(clamp(parseInt(e.target.value,10),10,40))} className="h-12 w-full" disabled={inputsLocked} />
             <div className="flex items-center gap-2 mt-1">
-              <input type="number" inputMode="numeric" min={10} max={40} step={1} value={coffeeInput} onChange={e => { const v = e.target.value; setCoffeeInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setCoffeeG(clamp(n,10,40)); }} onBlur={() => { const n = parseInt(coffeeInput,10); setCoffeeInput(Number.isNaN(n)? String(coffeeG): String(clamp(n,10,40))); }} className="w-20 h-10 rounded-lg px-2 bg-[var(--color-card-bg)] border border-[var(--color-card-border)] text-[var(--color-text)]" />
+              <input type="number" inputMode="numeric" min={10} max={40} step={1} value={coffeeInput} onChange={e => { const v = e.target.value; setCoffeeInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setCoffeeG(clamp(n,10,40)); }} onBlur={() => { const n = parseInt(coffeeInput,10); setCoffeeInput(Number.isNaN(n)? String(coffeeG): String(clamp(n,10,40))); }} className="w-20 h-10 rounded-lg px-2 bg-[var(--color-card-bg)] border border-[var(--color-card-border)] text-[var(--color-text)]" disabled={inputsLocked} />
               <span className="text-sm text-[var(--color-text)]">{totalWater} g total</span>
             </div>
           </div>
@@ -183,11 +200,11 @@ export default function Brew({ recipe, onBack }) {
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
               <label className="text-xs text-[var(--color-muted)]">Ratio (1:water)</label>
-              <button type="button" onClick={() => { setRatio(DEFAULT_RATIO); setRatioInput(String(DEFAULT_RATIO)); }} className="text-xs px-2 py-1 rounded-lg border border-[var(--color-card-border)] bg-[var(--color-bg)] text-[var(--color-text)]" aria-label="Reset ratio to default">Default</button>
+              <button type="button" onClick={() => { setRatio(DEFAULT_RATIO); setRatioInput(String(DEFAULT_RATIO)); }} className="text-xs px-2 py-1 rounded-lg border border-[var(--color-card-border)] bg-[var(--color-bg)] text-[var(--color-text)] disabled:opacity-50" aria-label="Reset ratio to default" disabled={inputsLocked}>Default</button>
             </div>
-            <input type="range" min={10} max={18} step={1} value={ratio} onChange={e => { const n = clamp(parseInt(e.target.value,10),10,18); setRatio(n); setRatioInput(String(n)); }} className="h-12 w-full" />
+            <input type="range" min={10} max={18} step={1} value={ratio} onChange={e => { const n = clamp(parseInt(e.target.value,10),10,18); setRatio(n); setRatioInput(String(n)); }} className="h-12 w-full" disabled={inputsLocked} />
             <div className="flex items-center gap-2 mt-1">
-              <input type="number" inputMode="numeric" min={10} max={18} step={1} value={ratioInput} onChange={e => { const v = e.target.value; setRatioInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setRatio(clamp(n,10,18)); }} onBlur={() => { const n = parseInt(ratioInput,10); setRatioInput(Number.isNaN(n)? String(ratio): String(clamp(n,10,18))); }} className="w-20 h-10 rounded-lg px-2 bg-[var(--color-card-bg)] border border-[var(--color-card-border)] text-[var(--color-text)]" />
+              <input type="number" inputMode="numeric" min={10} max={18} step={1} value={ratioInput} onChange={e => { const v = e.target.value; setRatioInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setRatio(clamp(n,10,18)); }} onBlur={() => { const n = parseInt(ratioInput,10); setRatioInput(Number.isNaN(n)? String(ratio): String(clamp(n,10,18))); }} className="w-20 h-10 rounded-lg px-2 bg-[var(--color-card-bg)] border border-[var(--color-card-border)] text-[var(--color-text)]" disabled={inputsLocked} />
             </div>
           </div>
 
@@ -207,9 +224,14 @@ export default function Brew({ recipe, onBack }) {
 
       {/* Timer */}
       <div className="mt-6 rounded-2xl bg-neutral-900/60 border border-neutral-700 p-5">
-        <div className="flex items-baseline gap-2 font-mono">
-          <div className="text-4xl font-semibold tracking-tight">{fmtClock(elapsedMs)}</div>
-          <div className="text-[var(--color-light-muted)]">/ {fmtClock(totalDurationMs)}</div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-baseline gap-2">
+            <div className="text-4xl font-semibold tracking-tight">{fmtClock(elapsedMs)}</div>
+            <div className="text-[var(--color-light-muted)]">/ {fmtClock(totalDurationMs)}</div>
+          </div>
+          {showWeightTarget && (
+            <div className="text-2xl font-semibold text-[var(--color-light-text)]">{currentCumTarget} g</div>
+          )}
         </div>
         <div className="mt-4 h-3 bg-neutral-800 rounded-full overflow-hidden">
           <div className="h-full bg-emerald-500" style={{ width: `${overallProgress * 100}%` }} />
@@ -218,7 +240,7 @@ export default function Brew({ recipe, onBack }) {
           <svg className="w-24 h-24" viewBox="0 0 100 100">
             <circle className="text-neutral-800" stroke="currentColor" strokeWidth="8" fill="transparent" r={radius} cx="50" cy="50" />
             <circle className="text-emerald-400 transition-all" stroke="currentColor" strokeWidth="8" strokeLinecap="round" fill="transparent" r={radius} cx="50" cy="50" style={{ strokeDasharray: circumference, strokeDashoffset: circumference * (1 - stepProgress) }} />
-            <text x="50" y="55" textAnchor="middle" className="fill-white text-xl font-mono">{fmtSecs(remainingSec)}</text>
+            <text x="50" y="55" textAnchor="middle" className="fill-white text-xl">{fmtSecs(remainingSec)}</text>
           </svg>
         </div>
         <div className="mt-4 text-sm text-[var(--color-light-muted)]" aria-live="polite">

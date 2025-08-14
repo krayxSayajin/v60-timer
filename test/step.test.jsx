@@ -8,13 +8,14 @@ describe('Step', () => {
   afterEach(() => {
     cleanup();
   });
-  it('shows coffee when active', () => {
+  it('renders active step without icon', () => {
     render(<Step step={step} idx={0} start="0:00" end="0:30" arrow={10} showWeightTarget isActive />);
-    expect(screen.getByText('☕')).toBeInTheDocument();
+    expect(screen.queryByText('☕')).toBeNull();
+    expect(screen.getByText('→ 10 g')).toBeInTheDocument();
   });
 
-  it('hides coffee when inactive', () => {
+  it('renders inactive step', () => {
     render(<Step step={step} idx={0} start="0:00" end="0:30" arrow={10} showWeightTarget={false} isActive={false} />);
-    expect(screen.queryByText('☕')).toBeNull();
+    expect(screen.getByText('Pour')).toBeInTheDocument();
   });
 });
