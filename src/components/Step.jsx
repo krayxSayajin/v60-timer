@@ -21,10 +21,10 @@ export default function Step({ step, idx, start, end, arrow, showWeightTarget, i
         </span>
       )}
       <div className="flex items-center justify-between">
-        <div className="font-medium">{step.label}</div>
-        <div className="text-stone-300 text-sm">{step.volume} g • {step.durationSec}s</div>
+        <div className="font-medium text-[var(--color-light-text)]">{step.label}</div>
+        <div className="text-[var(--color-light-muted)] text-sm">{step.volume} g • {step.durationSec}s</div>
       </div>
-      <div className="mt-1 flex items-center justify-between text-xs text-stone-400">
+      <div className="mt-1 flex items-center justify-between text-xs text-[var(--color-light-muted)]">
         <div>start {start}</div>
         <div>end {end}</div>
       </div>
