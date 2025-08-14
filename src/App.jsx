@@ -87,6 +87,8 @@ export default function App() {
   // -----------------------------
   // App state
   // -----------------------------
+  const DEFAULT_RATIO = 15;
+
   const [screen, setScreen] = useState("home"); // 'home' | 'brew'
   const [activeId, setActiveId] = useState(RECIPES[0].id);
   const activeRecipe = useMemo(
@@ -95,7 +97,7 @@ export default function App() {
   );
 
   const [coffeeG, setCoffeeG] = useState(20);
-  const [ratio, setRatio] = useState(15);
+  const [ratio, setRatio] = useState(DEFAULT_RATIO);
   const [waterTempC, setWaterTempC] = useState(activeRecipe.defaultTemp);
   const [showWeightTarget, setShowWeightTarget] = useState(true);
 
@@ -226,6 +228,12 @@ export default function App() {
     }
   }, [currentStepIdx]);
 
+  // Auto-scroll active step into view
+  useEffect(() => {
+    const el = document.getElementById(`step-${currentStepIdx}`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [currentStepIdx]);
+
   // -----------------------------
   // Audio (two-tone chime), iOS-friendly
   // -----------------------------
@@ -294,8 +302,7 @@ export default function App() {
 
   const onSkip = () => {
     ensureAudioContextFromGesture();
-    // Jump to end of current step (advances to next step index on render)
-    setElapsedMs(Math.min(stepEndMs, totalDurationMs));
+    setElapsedMs(Math.min(stepEndMs, totalDurationMs)); // jump to end of current step
   };
 
   const onPrev = () => {
@@ -315,7 +322,7 @@ export default function App() {
   const clampNumber = (val, min, max) => Math.max(min, Math.min(max, val));
 
   const fmtClock = (ms) => {
-    const s = Math.floor(ms / 1000);
+    const s = Math.max(0, Math.floor(ms / 1000));
     const m = Math.floor(s / 60);
     const rem = s % 60;
     return `${m}:${rem.toString().padStart(2, "0")}`;
@@ -327,6 +334,9 @@ export default function App() {
   const stepProgress = currentStep
     ? (Math.min(elapsedMs, stepEndMs) - stepStartMs) / (stepEndMs - stepStartMs || 1)
     : 0;
+
+  const canPrev = elapsedMs > 0;
+  const canSkip = elapsedMs < totalDurationMs;
 
   function shortName(full) {
     if (full.includes("Matt Winton")) return "Winton — 5-Pour";
@@ -421,9 +431,10 @@ export default function App() {
       <div className="sr-only" aria-live="polite">{ariaMsg}</div>
 
       {screen === "home" ? (
+        // ----------------- HOME SCREEN -----------------
         <div className="max-w-md mx-auto px-4 pb-24 pt-6">
           <header className="mb-4">
-            <h1 className="text-xl font-semibold tracking-tight">V60 Multi-Recipe Timer</h1>
+            <h1 className="text-xl font-semibold tracking-tight">BrewMate — V60 Timer</h1>
             <p className="text-stone-400 text-sm mt-1">Choose a recipe to begin brewing.</p>
           </header>
 
@@ -449,8 +460,9 @@ export default function App() {
           </div>
         </div>
       ) : (
+        // ----------------- BREW SCREEN -----------------
         <div className="max-w-md mx-auto px-4 pb-28 pt-3">
-          {/* Top bar */}
+          {/* Top bar with Back + active recipe */}
           <div className="flex items-center justify-between mb-3">
             <button
               type="button"
@@ -460,37 +472,21 @@ export default function App() {
             >
               ← Back
             </button>
-            <div className="text-sm text-stone-400">iPhone-friendly</div>
+            <div className="text-sm text-stone-300 truncate ml-2">{activeRecipe.name}</div>
+            <div className="w-12" aria-hidden="true" />{/* spacer */}
           </div>
 
-          {/* Pills row */}
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1">
-            {RECIPES.map(r => (
-              <button
-                key={r.id}
-                onClick={() => setActiveId(r.id)}
-                className={[
-                  "px-3 py-2 rounded-full border min-h-11 text-sm font-medium",
-                  r.id === activeId
-                    ? "bg-emerald-600 border-emerald-500 text-white"
-                    : "bg-stone-100 border-stone-300 text-stone-900"
-                ].join(" ")}
-                aria-pressed={r.id === activeId}
-              >
-                {shortName(r.name)}
-              </button>
-            ))}
-          </div>
-
-          {/* Active recipe summary card */}
-          <div className="rounded-2xl bg-stone-50 shadow-sm border border-stone-200 p-4 mt-3">
+          {/* Active recipe summary card (no pills row) */}
+          <div className="rounded-2xl bg-stone-50 shadow-sm border border-stone-200 p-4 mt-1">
             <h2 className="text-neutral-900 font-semibold">{activeRecipe.name}</h2>
             <p className="text-stone-700 text-sm">{activeRecipe.desc}</p>
 
             <div className="mt-3 grid grid-cols-3 gap-2">
-              {/* Coffee */}
+              {/* Coffee (slider + number) */}
               <div className="flex flex-col">
-                <label className="text-xs text-stone-700">Coffee (g)</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs text-stone-700">Coffee (g)</label>
+                </div>
                 <input
                   type="range"
                   min={10}
@@ -500,11 +496,34 @@ export default function App() {
                   onChange={(e) => setCoffeeG(clampNumber(parseInt(e.target.value || 0, 10), 10, 40))}
                   className="h-12 w-full"
                 />
-                <span className="text-sm text-neutral-900 mt-1">{coffeeG} g</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={10}
+                    max={40}
+                    step={1}
+                    value={coffeeG}
+                    onChange={(e) => setCoffeeG(clampNumber(parseInt(e.target.value || 0, 10), 10, 40))}
+                    className="w-20 h-10 rounded-lg px-2 bg-white border border-stone-300 text-neutral-900"
+                  />
+                  <span className="text-sm text-neutral-900">{coffeeG} g</span>
+                </div>
               </div>
-              {/* Ratio */}
+
+              {/* Ratio (slider + reset-to-default) */}
               <div className="flex flex-col">
-                <label className="text-xs text-stone-700">Ratio (1:water)</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs text-stone-700">Ratio (1:water)</label>
+                  <button
+                    type="button"
+                    onClick={() => setRatio(DEFAULT_RATIO)}
+                    className="text-xs px-2 py-1 rounded-lg border border-stone-300 bg-stone-100 text-stone-900"
+                    aria-label="Reset ratio to default"
+                  >
+                    Default
+                  </button>
+                </div>
                 <input
                   type="range"
                   min={10}
@@ -516,7 +535,8 @@ export default function App() {
                 />
                 <span className="text-sm text-neutral-900 mt-1">1:{ratio}</span>
               </div>
-              {/* Temp */}
+
+              {/* Temp (read-only per recipe) */}
               <div className="flex flex-col">
                 <label className="text-xs text-stone-700">Water temp (°C)</label>
                 <input
@@ -545,14 +565,14 @@ export default function App() {
             </div>
           </div>
 
-          {/* Timer / ring */}
+          {/* Timer / ring (shows CURRENT STEP time only) */}
           <div className="mt-5">
             <div className="relative w-64 h-64 mx-auto">
-              {/* Track/progress via conic-gradient */}
+              {/* Track/progress via conic-gradient (step progress) */}
               <div
                 className="absolute inset-0 rounded-full"
                 style={{
-                  background: `conic-gradient(#f59e0b ${stepProgress * 360}deg, #374151 0deg)`
+                  background: `conic-gradient(#f59e0b ${Math.max(0, Math.min(1, stepProgress)) * 360}deg, #374151 0deg)`
                 }}
                 aria-hidden="true"
               />
@@ -562,18 +582,30 @@ export default function App() {
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                 <div className="text-4xl font-semibold tabular-nums">{fmtClock(elapsedMs - stepStartMs)}</div>
                 <div className="text-stone-400 text-sm">of {fmtClock(stepEndMs - stepStartMs)}</div>
+                {showWeightTarget && (
+                  <div className="mt-2 text-emerald-400 text-sm">
+                    Target: <span className="font-semibold">{currentPourTarget} g</span>
+                  </div>
+                )}
               </div>
             </div>
-            {/* Global progress bar */}
-            <div className="mt-3 h-2 rounded-full bg-neutral-700 overflow-hidden">
-              <div
-                className="h-full rounded-full"
-                style={{ width: `${Math.min(100, Math.max(0, overallProgress * 100))}%`, backgroundColor: "#f59e0b" }}
-              />
+
+            {/* TOTAL (GLOBAL) TIMER BAR — labeled */}
+            <div className="mt-4">
+              <div className="flex items-center justify-between text-xs text-stone-300 mb-1">
+                <span>Total time</span>
+                <span>{fmtClock(elapsedMs)} / {fmtClock(totalDurationMs)}</span>
+              </div>
+              <div className="h-2 rounded-full bg-neutral-700 overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{ width: `${Math.min(100, Math.max(0, overallProgress * 100))}%`, backgroundColor: "#f59e0b" }}
+                />
+              </div>
             </div>
           </div>
 
-          {/* Current step panel */}
+          {/* Current step panel (keeps mini step bar) */}
           <div className="mt-5 rounded-2xl bg-neutral-800/60 border border-neutral-700 p-4">
             <div className="flex items-center justify-between">
               <div className="font-medium">{currentStep?.label || "Step"}</div>
@@ -593,7 +625,11 @@ export default function App() {
               <button
                 type="button"
                 onClick={onPrev}
-                className="h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-medium"
+                disabled={!canPrev}
+                className={[
+                  "h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-medium",
+                  !canPrev ? "opacity-50 cursor-not-allowed" : ""
+                ].join(" ")}
               >
                 Prev
               </button>
@@ -607,7 +643,11 @@ export default function App() {
               <button
                 type="button"
                 onClick={onSkip}
-                className="h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-medium"
+                disabled={!canSkip}
+                className={[
+                  "h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-medium",
+                  !canSkip ? "opacity-50 cursor-not-allowed" : ""
+                ].join(" ")}
               >
                 Skip
               </button>
@@ -631,6 +671,7 @@ export default function App() {
               const isActivePour = i === currentStepIdx && s.volume > 0; // highlight during pours
               return (
                 <div
+                  id={`step-${i}`}
                   key={i}
                   className={[
                     "relative rounded-xl border p-3 transition-colors",
