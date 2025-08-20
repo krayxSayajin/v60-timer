@@ -13,7 +13,7 @@ export const RECIPES = [
         { label: "Pour 3", volume: per, durationSec: 25 },
         { label: "Pour 4", volume: per, durationSec: 25 },
         { label: "Pour 5", volume: per, durationSec: 25 },
-        { label: "Drawdown", volume: 0, durationSec: 80 },
+        { label: "Drawdown", volume: 0, durationSec: 40 },
       ];
     },
   },
@@ -24,13 +24,17 @@ export const RECIPES = [
     defaultTemp: 93,
     buildSteps: (coffeeG, ratio) => {
       const total = Math.round(coffeeG * ratio);
-      const p20 = Math.round(total * 0.20);
+      const p1 = Math.round(total * (1 / 6)); // ~50g of 300g
+      const p2 = Math.round(total * (7 / 30)); // ~70g of 300g
+      const p3 = Math.round(total * (1 / 5)); // ~60g of 300g
+      const p4 = Math.round(total * (1 / 5));
+      const p5 = total - (p1 + p2 + p3 + p4); // ensure sums to total
       return [
-        { label: "Taste 1", volume: p20, durationSec: 25 },
-        { label: "Taste 2", volume: p20, durationSec: 25 },
-        { label: "Strength 1", volume: p20, durationSec: 25 },
-        { label: "Strength 2", volume: p20, durationSec: 25 },
-        { label: "Strength 3", volume: p20, durationSec: 25 },
+        { label: "Taste 1", volume: p1, durationSec: 45 },
+        { label: "Taste 2", volume: p2, durationSec: 45 },
+        { label: "Strength 1", volume: p3, durationSec: 45 },
+        { label: "Strength 2", volume: p4, durationSec: 45 },
+        { label: "Strength 3", volume: p5, durationSec: 45 },
         { label: "Drawdown", volume: 0, durationSec: 90 },
       ];
     },

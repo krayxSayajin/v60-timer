@@ -149,11 +149,27 @@ export default function Brew({ recipe, onBack }) {
   const fmtClock = ms => { const s = Math.max(0, Math.floor(ms / 1000)); const m = Math.floor(s / 60); const rem = s % 60; return `${m}:${rem.toString().padStart(2,'0')}`; };
   const fmtSecs = sec => `${sec}s`;
   const overallProgress = totalDurationMs ? elapsedMs / totalDurationMs : 0;
-  const stepProgress = currentStep ? (Math.min(elapsedMs, stepEndMs) - stepStartMs) / (stepEndMs - stepStartMs || 1) : 0;
+  const stepElapsedMs = Math.min(elapsedMs, stepEndMs) - stepStartMs;
+  const POUR_MS = 5000;
+  const pourMs = currentStep && currentStep.volume > 0 ? Math.min(POUR_MS, stepEndMs - stepStartMs) : 0;
+  const restMs = (stepEndMs - stepStartMs) - pourMs;
+  let phaseRemainingMs;
+  let phaseTotalMs;
+  let phaseLabel;
+  if (pourMs > 0 && stepElapsedMs < pourMs) {
+    phaseRemainingMs = pourMs - stepElapsedMs;
+    phaseTotalMs = pourMs;
+    phaseLabel = 'Pour';
+  } else {
+    const restElapsed = Math.max(stepElapsedMs - pourMs, 0);
+    phaseRemainingMs = Math.max(restMs - restElapsed, 0);
+    phaseTotalMs = restMs;
+    phaseLabel = currentStep && currentStep.volume > 0 ? 'Wait/Rest' : currentStep?.label || 'Step';
+  }
+  const stepProgress = phaseTotalMs ? (phaseTotalMs - phaseRemainingMs) / phaseTotalMs : 0;
+  const remainingSec = Math.ceil(phaseRemainingMs / 1000);
   const canPrev = elapsedMs > 0;
   const canSkip = elapsedMs < totalDurationMs;
-  const remainingMs = Math.max(0, stepEndMs - Math.min(elapsedMs, stepEndMs));
-  const remainingSec = Math.ceil(remainingMs / 1000);
   const currentCumTarget = cumPourTargets[currentStepIdx] || 0;
   const inputsLocked = isRunning || elapsedMs > 0;
   const radius = 45;
@@ -245,7 +261,7 @@ export default function Brew({ recipe, onBack }) {
         </div>
         <div className="mt-4 text-sm text-[var(--color-light-muted)]" aria-live="polite">
           <div className="flex items-center justify-between">
-            <div className="font-medium">{currentStep?.label || 'Step'}</div>
+            <div className="font-medium">{phaseLabel}</div>
             <div className="text-[var(--color-light-muted)] text-sm">{currentStep?.volume || 0} g • {fmtSecs(currentStep?.durationSec || 0)}</div>
           </div>
           <div className="mt-4 grid grid-cols-3 gap-2">
