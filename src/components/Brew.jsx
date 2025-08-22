@@ -205,7 +205,7 @@ export default function Brew({ recipe, onBack }) {
             <div className="flex items-center justify-between">
               <label className="text-xs text-[var(--color-muted)]">Coffee (g)</label>
             </div>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="grid grid-cols-[1fr_auto] items-center gap-2 mt-1">
               <input
                 type="range"
                 min={10}
@@ -213,7 +213,7 @@ export default function Brew({ recipe, onBack }) {
                 step={1}
                 value={coffeeG}
                 onChange={e => setCoffeeG(clamp(parseInt(e.target.value, 10), 10, 40))}
-                className="h-12 flex-1"
+                className="h-10 w-full min-w-0"
                 disabled={inputsLocked}
               />
               <input
@@ -253,7 +253,7 @@ export default function Brew({ recipe, onBack }) {
                 Default
               </button>
             </div>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="grid grid-cols-[1fr_auto] items-center gap-2 mt-1">
               <input
                 type="range"
                 min={10}
@@ -265,7 +265,7 @@ export default function Brew({ recipe, onBack }) {
                   setRatio(n);
                   setRatioInput(String(n));
                 }}
-                className="h-12 flex-1"
+                className="h-10 w-full min-w-0"
                 disabled={inputsLocked}
               />
               <input
