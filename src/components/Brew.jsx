@@ -206,9 +206,9 @@ export default function Brew({ recipe, onBack }) {
               <label className="text-xs text-[var(--color-muted)]">Coffee (g)</label>
             </div>
             <input type="range" min={10} max={40} step={1} value={coffeeG} onChange={e => setCoffeeG(clamp(parseInt(e.target.value,10),10,40))} className="h-12 w-full" disabled={inputsLocked} />
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex flex-col items-start mt-1">
               <input type="number" inputMode="numeric" min={10} max={40} step={1} value={coffeeInput} onChange={e => { const v = e.target.value; setCoffeeInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setCoffeeG(clamp(n,10,40)); }} onBlur={() => { const n = parseInt(coffeeInput,10); setCoffeeInput(Number.isNaN(n)? String(coffeeG): String(clamp(n,10,40))); }} className="w-20 h-10 rounded-lg px-2 bg-[var(--color-card-bg)] border border-[var(--color-card-border)] text-[var(--color-text)]" disabled={inputsLocked} />
-              <span className="text-sm text-[var(--color-text)]">{totalWater} g total</span>
+              <span className="text-sm text-[var(--color-text)] mt-1">{totalWater} g total</span>
             </div>
           </div>
 
@@ -218,7 +218,7 @@ export default function Brew({ recipe, onBack }) {
               <button type="button" onClick={() => { setRatio(DEFAULT_RATIO); setRatioInput(String(DEFAULT_RATIO)); }} className="text-xs px-2 py-1 rounded-lg border border-[var(--color-card-border)] bg-[var(--color-bg)] text-[var(--color-text)] disabled:opacity-50" aria-label="Reset ratio to default" disabled={inputsLocked}>Default</button>
             </div>
             <input type="range" min={10} max={18} step={1} value={ratio} onChange={e => { const n = clamp(parseInt(e.target.value,10),10,18); setRatio(n); setRatioInput(String(n)); }} className="h-12 w-full" disabled={inputsLocked} />
-            <div className="flex items-center gap-2 mt-1">
+            <div className="mt-1">
               <input type="number" inputMode="numeric" min={10} max={18} step={1} value={ratioInput} onChange={e => { const v = e.target.value; setRatioInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setRatio(clamp(n,10,18)); }} onBlur={() => { const n = parseInt(ratioInput,10); setRatioInput(Number.isNaN(n)? String(ratio): String(clamp(n,10,18))); }} className="w-20 h-10 rounded-lg px-2 bg-[var(--color-card-bg)] border border-[var(--color-card-border)] text-[var(--color-text)]" disabled={inputsLocked} />
             </div>
           </div>
@@ -264,7 +264,7 @@ export default function Brew({ recipe, onBack }) {
               aria-label="Previous step"
               className={["h-12 rounded-xl flex items-center justify-center bg-[var(--color-prev)] text-[var(--color-light-text)]", "hover:opacity-90 active:opacity-80", !canPrev ? "opacity-50 cursor-not-allowed" : ""].join(' ')}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M9 19l-7-7 7-7v14zm3-14l7 7-7 7V5z" /></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M15 19V5l-7 7 7 7z" /></svg>
             </button>
             <button
               type="button"
@@ -285,7 +285,7 @@ export default function Brew({ recipe, onBack }) {
               aria-label="Next step"
               className={["h-12 rounded-xl flex items-center justify-center bg-[var(--color-skip)] text-[var(--color-light-text)]", "hover:opacity-90 active:opacity-80", !canSkip ? "opacity-50 cursor-not-allowed" : ""].join(' ')}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M15 5v14l7-7-7-7zm-3 14V5l-7 7 7 7z" /></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M9 5v14l7-7-7-7z" /></svg>
             </button>
           </div>
           <button
