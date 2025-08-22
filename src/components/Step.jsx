@@ -7,8 +7,8 @@ export default function Step({ step, idx, start, end, arrow, showWeightTarget, i
       className={[
         'relative rounded-xl border p-3 transition-colors',
         isActive
-          ? 'bg-[var(--color-accent)]/20 border-[var(--color-accent)] shadow-[0_0_0_1px_rgba(37,99,235,0.25)]'
-          : 'bg-neutral-800/60 border-neutral-700'
+          ? 'bg-[var(--color-accent)]/20 border-[var(--color-accent)]'
+          : 'bg-[var(--color-card-bg)] border-[var(--color-card-border)]'
       ].join(' ')}
       aria-current={isActive ? 'step' : undefined}
     >

@@ -122,11 +122,7 @@ export default function Brew({ recipe, onBack }) {
     if (currentStepIdx !== prevStepIdxRef.current) { safeChime(); prevStepIdxRef.current = currentStepIdx; }
   }, [currentStepIdx, safeChime]);
 
-  // auto scroll
-  useEffect(() => {
-    const el = document.getElementById(`step-${currentStepIdx}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, [currentStepIdx]);
+  // auto scroll removed to keep focus on central timer
 
   function hardReset(withGestureResume = true) {
     if (withGestureResume) ensureAudioContextFromGesture();
@@ -187,21 +183,24 @@ export default function Brew({ recipe, onBack }) {
       <div className="rounded-2xl bg-[var(--color-card-bg)] shadow-sm border border-[var(--color-card-border)] p-4 mt-1">
         <div className="flex items-center justify-between">
           <h2 className="text-[var(--color-text)] font-semibold">{recipe.name}</h2>
-          {recipe.desc && !showInfo && (
-            <button
-              type="button"
-              onClick={() => setShowInfo(true)}
-              className="text-xs text-[var(--color-muted)] underline"
-            >
-              See More Info
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {recipe.desc && (
+              <button
+                type="button"
+                onClick={() => setShowInfo(s => !s)}
+                className="text-xs text-[var(--color-muted)] underline"
+              >
+                {showInfo ? 'See Less Info' : 'See More Info'}
+              </button>
+            )}
+            <span className="text-xs text-[var(--color-muted)]">{waterTempC}°C</span>
+          </div>
         </div>
         {showInfo && recipe.desc && (
           <p className="text-[var(--color-muted)] text-sm mt-1">{recipe.desc}</p>
         )}
 
-        <div className="mt-3 grid grid-cols-3 gap-2">
+        <div className="mt-3 grid grid-cols-2 gap-2">
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
               <label className="text-xs text-[var(--color-muted)]">Coffee (g)</label>
@@ -223,13 +222,6 @@ export default function Brew({ recipe, onBack }) {
               <input type="number" inputMode="numeric" min={10} max={18} step={1} value={ratioInput} onChange={e => { const v = e.target.value; setRatioInput(v); const n = parseInt(v,10); if (!Number.isNaN(n)) setRatio(clamp(n,10,18)); }} onBlur={() => { const n = parseInt(ratioInput,10); setRatioInput(Number.isNaN(n)? String(ratio): String(clamp(n,10,18))); }} className="w-20 h-10 rounded-lg px-2 bg-[var(--color-card-bg)] border border-[var(--color-card-border)] text-[var(--color-text)]" disabled={inputsLocked} />
             </div>
           </div>
-
-          <div className="flex flex-col">
-            <div className="flex items-center justify-between">
-              <label className="text-xs text-[var(--color-muted)]">Water temp (°C)</label>
-            </div>
-            <div className="h-12 flex items-center text-[var(--color-text)]">{waterTempC}°C</div>
-          </div>
         </div>
 
         <div className="mt-3 flex items-center gap-2">
@@ -239,7 +231,7 @@ export default function Brew({ recipe, onBack }) {
       </div>
 
       {/* Timer */}
-      <div className="mt-6 rounded-2xl bg-neutral-900/60 border border-neutral-700 p-5">
+      <div className="mt-6 rounded-2xl bg-[var(--color-card-bg)] border border-[var(--color-card-border)] p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-2">
             <div className="text-4xl font-semibold tracking-tight">{fmtClock(elapsedMs)}</div>
@@ -249,14 +241,14 @@ export default function Brew({ recipe, onBack }) {
             <div className="text-2xl font-semibold text-[var(--color-light-text)]">{currentCumTarget} g</div>
           )}
         </div>
-        <div className="mt-4 h-3 bg-neutral-800 rounded-full overflow-hidden">
-          <div className="h-full bg-emerald-500" style={{ width: `${overallProgress * 100}%` }} />
+        <div className="mt-4 h-3 bg-[var(--color-card-border)] rounded-full overflow-hidden">
+          <div className="h-full bg-[var(--color-accent)]" style={{ width: `${overallProgress * 100}%` }} />
         </div>
         <div className="mt-6 flex justify-center">
           <svg className="w-24 h-24" viewBox="0 0 100 100">
-            <circle className="text-neutral-800" stroke="currentColor" strokeWidth="8" fill="transparent" r={radius} cx="50" cy="50" />
-            <circle className="text-emerald-400 transition-all" stroke="currentColor" strokeWidth="8" strokeLinecap="round" fill="transparent" r={radius} cx="50" cy="50" style={{ strokeDasharray: circumference, strokeDashoffset: circumference * (1 - stepProgress) }} />
-            <text x="50" y="55" textAnchor="middle" className="fill-white text-xl">{fmtSecs(remainingSec)}</text>
+            <circle className="text-[var(--color-card-border)]" stroke="currentColor" strokeWidth="8" fill="transparent" r={radius} cx="50" cy="50" />
+            <circle className="text-[var(--color-accent)] transition-all" stroke="currentColor" strokeWidth="8" strokeLinecap="round" fill="transparent" r={radius} cx="50" cy="50" style={{ strokeDasharray: circumference, strokeDashoffset: circumference * (1 - stepProgress) }} />
+            <text x="50" y="55" textAnchor="middle" className="fill-[var(--color-light-text)] text-xl">{fmtSecs(remainingSec)}</text>
           </svg>
         </div>
         <div className="mt-4 text-sm text-[var(--color-light-muted)]" aria-live="polite">
@@ -265,11 +257,44 @@ export default function Brew({ recipe, onBack }) {
             <div className="text-[var(--color-light-muted)] text-sm">{currentStep?.volume || 0} g • {fmtSecs(currentStep?.durationSec || 0)}</div>
           </div>
           <div className="mt-4 grid grid-cols-3 gap-2">
-            <button type="button" onClick={onPrev} disabled={!canPrev} className={["h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-medium", !canPrev ? "opacity-50 cursor-not-allowed" : ""].join(' ')}>Prev</button>
-            <button type="button" onClick={onStartPause} className="h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-semibold">{isRunning ? 'Pause' : 'Start'}</button>
-            <button type="button" onClick={onSkip} disabled={!canSkip} className={["h-12 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-medium", !canSkip ? "opacity-50 cursor-not-allowed" : ""].join(' ')}>Skip</button>
+            <button
+              type="button"
+              onClick={onPrev}
+              disabled={!canPrev}
+              aria-label="Previous step"
+              className={["h-12 rounded-xl flex items-center justify-center bg-[var(--color-prev)] text-[var(--color-light-text)]", "hover:opacity-90 active:opacity-80", !canPrev ? "opacity-50 cursor-not-allowed" : ""].join(' ')}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M9 19l-7-7 7-7v14zm3-14l7 7-7 7V5z" /></svg>
+            </button>
+            <button
+              type="button"
+              onClick={onStartPause}
+              aria-label={isRunning ? 'Pause' : 'Start'}
+              className="h-12 rounded-xl flex items-center justify-center bg-[var(--color-start)] text-[var(--color-light-text)] hover:opacity-90 active:opacity-80"
+            >
+              {isRunning ? (
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" /></svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M5 3l14 9-14 9V3z" /></svg>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={onSkip}
+              disabled={!canSkip}
+              aria-label="Next step"
+              className={["h-12 rounded-xl flex items-center justify-center bg-[var(--color-skip)] text-[var(--color-light-text)]", "hover:opacity-90 active:opacity-80", !canSkip ? "opacity-50 cursor-not-allowed" : ""].join(' ')}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M15 5v14l7-7-7-7zm-3 14V5l-7 7 7 7z" /></svg>
+            </button>
           </div>
-          <button type="button" onClick={onReset} className="mt-3 w-full h-12 rounded-xl border border-[var(--color-light-muted)] bg-neutral-900 text-[var(--color-light-text)] font-medium">Reset</button>
+          <button
+            type="button"
+            onClick={onReset}
+            className="mt-3 w-full h-12 rounded-xl border border-[var(--color-light-muted)] bg-[var(--color-bg)] text-[var(--color-light-text)] font-medium"
+          >
+            Reset
+          </button>
         </div>
       </div>
 
@@ -299,7 +324,7 @@ export default function Brew({ recipe, onBack }) {
           <div className="absolute inset-0 bg-black/30" />
           <div className="relative">
             <div className="w-28 h-28 rounded-full bg-white flex items-center justify-center shadow-xl" style={{ animation: 'popIn 300ms ease-out forwards' }}>
-              <span className="text-emerald-600 text-5xl leading-none">✓</span>
+              <span className="text-[var(--color-accent)] text-5xl leading-none">✓</span>
             </div>
             <div className="absolute inset-0 -translate-x-1/2 left-1/2">
               {Array.from({ length: 12 }).map((_, i) => (
