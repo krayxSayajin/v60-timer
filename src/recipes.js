@@ -35,7 +35,7 @@ export const RECIPES = [
         { label: "Strength 1", volume: p3, durationSec: 45 },
         { label: "Strength 2", volume: p4, durationSec: 45 },
         { label: "Strength 3", volume: p5, durationSec: 45 },
-        { label: "Drawdown", volume: 0, durationSec: 90 },
+        { label: "Drawdown", volume: 0, durationSec: 30 },
       ];
     },
   },
