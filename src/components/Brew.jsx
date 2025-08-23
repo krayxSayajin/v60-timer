@@ -312,7 +312,8 @@ export default function Brew({ recipe, onBack }) {
         <div className="mt-4 h-3 bg-[var(--color-card-border)] rounded-full overflow-hidden">
           <div className="h-full bg-[var(--color-accent)]" style={{ width: `${overallProgress * 100}%` }} />
         </div>
-        <div className="mt-6 flex justify-center">
+        <div className="mt-4 text-center text-[var(--color-light-text)] font-medium">{currentStep?.label}</div>
+        <div className="mt-2 flex justify-center">
           <svg className="w-24 h-24" viewBox="0 0 100 100">
             <circle className="text-[var(--color-card-border)]" stroke="currentColor" strokeWidth="8" fill="transparent" r={radius} cx="50" cy="50" />
             <circle className="text-[var(--color-accent)] transition-all" stroke="currentColor" strokeWidth="8" strokeLinecap="round" fill="transparent" r={radius} cx="50" cy="50" style={{ strokeDasharray: circumference, strokeDashoffset: circumference * (1 - stepProgress) }} />
@@ -330,9 +331,9 @@ export default function Brew({ recipe, onBack }) {
               onClick={onPrev}
               disabled={!canPrev}
               aria-label="Previous step"
-              className={["h-12 rounded-xl flex items-center justify-center bg-[var(--color-prev)] text-[var(--color-light-text)]", "hover:opacity-90 active:opacity-80", !canPrev ? "opacity-50 cursor-not-allowed" : ""].join(' ')}
+              className={["h-12 rounded-xl flex items-center justify-center bg-[var(--color-skip)] text-[var(--color-light-text)]", "hover:opacity-90 active:opacity-80", !canPrev ? "opacity-50 cursor-not-allowed" : ""].join(' ')}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M15 19V5l-7 7 7 7z" /></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M20 19V5l-7 7 7 7zM13 19V5l-7 7 7 7z" /></svg>
             </button>
             <button
               type="button"
@@ -353,7 +354,7 @@ export default function Brew({ recipe, onBack }) {
               aria-label="Next step"
               className={["h-12 rounded-xl flex items-center justify-center bg-[var(--color-skip)] text-[var(--color-light-text)]", "hover:opacity-90 active:opacity-80", !canSkip ? "opacity-50 cursor-not-allowed" : ""].join(' ')}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M9 5v14l7-7-7-7z" /></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path d="M4 5v14l7-7-7-7zM11 5v14l7-7-7-7z" /></svg>
             </button>
           </div>
           <button
