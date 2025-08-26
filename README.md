@@ -7,6 +7,7 @@ Mobile-first V60 timer with multiple recipes, pour-based running weight targets,
 - **Multiple recipes (pills to switch):**
   - Matt Winton — 5-Pour
   - Tetsu Kasuya — 4:6
+  - Tetsu Kasuya — Switch
   - James Hoffmann — Bloom + 60/40
   - James Hoffmann — 5-Pour (2019)
 - **Pour-based running weight target** (shows cumulative target per pour; per-step arrows in list).
