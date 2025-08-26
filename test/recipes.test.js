@@ -14,4 +14,13 @@ describe('recipe builders', () => {
     const steps = r.buildSteps(18, 15);
     expect(steps).toHaveLength(6);
   });
+
+  it('kasuyaSwitch splits water evenly', () => {
+    const r = RECIPES.find(r => r.id === 'kasuyaSwitch');
+    const steps = r.buildSteps(20, 16);
+    expect(steps).toHaveLength(3);
+    expect(steps[0].volume).toBe(steps[1].volume);
+    const total = steps.reduce((a, s) => a + s.volume, 0);
+    expect(total).toBe(Math.round(20 * 16));
+  });
 });

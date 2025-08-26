@@ -40,6 +40,22 @@ export const RECIPES = [
     },
   },
   {
+    id: "kasuyaSwitch",
+    name: "Tetsu Kasuya — Switch",
+    desc: "Two equal pours with a closed steep, then open to drain.",
+    defaultTemp: 93,
+    buildSteps: (coffeeG, ratio) => {
+      const total = Math.round(coffeeG * ratio);
+      const p1 = Math.round(total / 2);
+      const p2 = total - p1; // ensure sums to total
+      return [
+        { label: "Pour 1 (open)", volume: p1, durationSec: 45 },
+        { label: "Pour 2 (close)", volume: p2, durationSec: 75 },
+        { label: "Drawdown", volume: 0, durationSec: 60 },
+      ];
+    },
+  },
+  {
     id: "hoffmann6040",
     name: "James Hoffmann — Bloom + 60/40",
     desc: "Bloom ~2× coffee for 45s, then 60/40 split.",
