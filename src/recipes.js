@@ -49,9 +49,9 @@ export const RECIPES = [
       const p1 = Math.round(total / 2);
       const p2 = total - p1; // ensure sums to total
       return [
-        { label: "Pour 1 (open)", volume: p1, durationSec: 45 },
-        { label: "Pour 2 (close)", volume: p2, durationSec: 75 },
-        { label: "Drawdown", volume: 0, durationSec: 60 },
+        { label: "Pour 1 - Close Switch When Done", volume: p1, durationSec: 45 },
+        { label: "Pour 2 - Closed", volume: p2, durationSec: 75 },
+        { label: "Drawdown - Open Switch", volume: 0, durationSec: 60 },
       ];
     },
   },
