@@ -23,4 +23,18 @@ describe('recipe builders', () => {
     const total = steps.reduce((a, s) => a + s.volume, 0);
     expect(total).toBe(Math.round(20 * 16));
   });
+
+  it('provides recipe-specific default ratios', () => {
+    const expected = {
+      winton5: 15,
+      kasuya46: 15,
+      kasuyaSwitch: 16,
+      hoffmann6040: 15,
+      hoffmann5: 15,
+    };
+    for (const [id, ratio] of Object.entries(expected)) {
+      const r = RECIPES.find(rcp => rcp.id === id);
+      expect(r.defaultRatio).toBe(ratio);
+    }
+  });
 });

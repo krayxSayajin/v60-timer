@@ -4,6 +4,7 @@ export const RECIPES = [
     name: "Matt Winton — 5-Pour",
     desc: "Five equal pours; gentle pace and even bed.",
     defaultTemp: 93,
+    defaultRatio: 15,
     buildSteps: (coffeeG, ratio) => {
       const total = Math.round(coffeeG * ratio);
       const per = Math.round(total / 5);
@@ -22,6 +23,7 @@ export const RECIPES = [
     name: "Tetsu Kasuya — 4:6",
     desc: "First 40% for taste (2 pours), last 60% for strength (3 pours).",
     defaultTemp: 93,
+    defaultRatio: 15,
     buildSteps: (coffeeG, ratio) => {
       const total = Math.round(coffeeG * ratio);
       const p1 = Math.round(total * (1 / 6)); // ~50g of 300g
@@ -44,6 +46,7 @@ export const RECIPES = [
     name: "Tetsu Kasuya — Switch",
     desc: "Two equal pours with a closed steep, then open to drain.",
     defaultTemp: 93,
+    defaultRatio: 16,
     buildSteps: (coffeeG, ratio) => {
       const total = Math.round(coffeeG * ratio);
       const p1 = Math.round(total / 2);
@@ -60,6 +63,7 @@ export const RECIPES = [
     name: "James Hoffmann — Bloom + 60/40",
     desc: "Bloom ~2× coffee for 45s, then 60/40 split.",
     defaultTemp: 100,
+    defaultRatio: 15,
     buildSteps: (coffeeG, ratio) => {
       const total = Math.round(coffeeG * ratio);
       const bloom = Math.round(coffeeG * 2);
@@ -78,6 +82,7 @@ export const RECIPES = [
     name: "James Hoffmann — 5-Pour (2019)",
     desc: "Bloom ~2× coffee, then 4 equal pours.",
     defaultTemp: 100,
+    defaultRatio: 15,
     buildSteps: (coffeeG, ratio) => {
       const total = Math.round(coffeeG * ratio);
       const bloom = Math.round(coffeeG * 2);

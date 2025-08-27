@@ -2,14 +2,14 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Step from './Step';
 
 export default function Brew({ recipe, onBack }) {
-  const DEFAULT_RATIO = 15;
+  const defaultRatio = recipe.defaultRatio ?? 15;
   const [coffeeG, setCoffeeG] = useState(20);
-  const [ratio, setRatio] = useState(DEFAULT_RATIO);
+  const [ratio, setRatio] = useState(defaultRatio);
   const [showWeightTarget, setShowWeightTarget] = useState(true);
   const [showInfo, setShowInfo] = useState(false);
   const waterTempC = recipe.defaultTemp;
   const [coffeeInput, setCoffeeInput] = useState(String(20));
-  const [ratioInput, setRatioInput] = useState(String(DEFAULT_RATIO));
+  const [ratioInput, setRatioInput] = useState(String(defaultRatio));
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -67,9 +67,11 @@ export default function Brew({ recipe, onBack }) {
   useEffect(() => { setRatioInput(String(ratio)); }, [ratio]);
   useEffect(() => {
     hardReset(false);
+    setRatio(defaultRatio);
+    setRatioInput(String(defaultRatio));
     setShowInfo(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recipe]);
+  }, [recipe, defaultRatio]);
 
   // derived step data
   const totalWater = useMemo(() => Math.round(coffeeG * ratio), [coffeeG, ratio]);
@@ -245,7 +247,7 @@ export default function Brew({ recipe, onBack }) {
               <label className="text-xs text-[var(--color-muted)]">Ratio (1:water)</label>
               <button
                 type="button"
-                onClick={() => { setRatio(DEFAULT_RATIO); setRatioInput(String(DEFAULT_RATIO)); }}
+                onClick={() => { setRatio(defaultRatio); setRatioInput(String(defaultRatio)); }}
                 className="text-xs px-2 py-1 rounded-lg border border-[var(--color-card-border)] bg-[var(--color-bg)] text-[var(--color-text)] disabled:opacity-50"
                 aria-label="Reset ratio to default"
                 disabled={inputsLocked}
